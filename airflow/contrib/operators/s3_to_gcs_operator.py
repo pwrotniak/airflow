@@ -104,6 +104,7 @@ class S3ToGoogleCloudStorageOperator(S3ListOperator):
                  delegate_to=None,
                  replace=False,
                  gzip=False,
+                 xcom_push=True,
                  *args,
                  **kwargs):
 
@@ -127,6 +128,7 @@ class S3ToGoogleCloudStorageOperator(S3ListOperator):
         self.replace = replace
         self.verify = verify
         self.gzip = gzip
+        self.xcom_push_flag = xcom_push
 
         if dest_gcs and not self._gcs_object_is_directory(self.dest_gcs):
             self.log.info(
@@ -209,8 +211,8 @@ class S3ToGoogleCloudStorageOperator(S3ListOperator):
             self.log.info(
                 'In sync, no files needed to be uploaded to Google Cloud'
                 'Storage')
-
-        return files
+        if self.xcom_push_flag:
+            return files
 
     # Following functionality may be better suited in
     # airflow/contrib/hooks/gcs.py
